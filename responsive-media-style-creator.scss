@@ -1,0 +1,80 @@
+
+@mixin media-assertion($s,$l,$min,$max){
+	@media screen {
+		@if $l {
+			@media (min-width:$min){
+				@content;
+			}
+		} @else if $s {
+			@media (max-width:$max){
+				@content;
+			}
+		} @else {
+			@media (min-width:$min) and (max-width:$max){
+				@content;
+			}
+		}
+	}			
+}
+
+@mixin media($size,$extend:null){
+	$s: $extend==andsmaller;
+	$l: $extend==andlarger;
+	
+	@if $size == xsmall {
+		@include media-assertion(true,false,null,480px){@content;};
+	} @else if $size == small {
+		@include media-assertion($s,$l,481px,768px){@content;};
+	} @else if $size == medium {
+		@include media-assertion($s,$l,769px,992px){@content;};
+	} @else if $size == large {
+		@include media-assertion($s,$l,993px,1200px){@content;};
+	} @else if $size == xlarge {
+		@include media-assertion(false,true,1201px,null){@content;};
+	}
+}
+
+///////////////
+//EXPLANATION//
+///////////////
+
+/*
+@include media(xsmall){};					  < 480px
+@include media(small){};				481px - 768px
+@include media(small,andsmaller){};			  < 768px	
+@include media(small,andlarger){};		481px <
+@include media(medium){};				769px - 992px
+@include media(medium,andsmaller){};		  < 992px
+@include media(medium,andlarger){};		769px <
+@include media(large){};				993px - 1200px
+@include media(large,andsmaller){};			  < 1200px
+@include media(large,andlarger){};		993px <
+@include media(xlarge){};				1201px <
+*/
+
+
+//////////
+//SAMPLE//
+//////////
+
+.containerA {
+	margin:auto;
+	height:100px;
+	@include media(xsmall){width:100%};
+	@include media(small){width:80%};
+	@include media(medium){width:760px};
+	@include media(large){width:960px};
+	@include media(xlarge){width:1200px};
+}
+
+.containerA {
+	background-color:green;				//769px - 992px;
+	
+	@include media(small,andsmaller){	//0px - 768px
+		background-color:red
+	};
+	
+	@include media(large,andlarger){	//993px <
+		background-color:blue
+	};
+}
