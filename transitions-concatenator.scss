@@ -1,0 +1,56 @@
+@mixin transitions($action, $compositions...){
+  $list:();
+  @each $getComposition in $compositions{
+    $list: append($list, map-get($getComposition, transition), comma);
+    @each $prop, $value in map-get($getComposition, before) {
+      #{inspect($prop)}: #{inspect($value)};
+    }
+  }
+  transition: $list;
+  &:#{$action}{
+    @each $getComposition in $compositions{
+      @each $prop, $value in map-get($getComposition, after) {
+        #{inspect($prop)}: #{inspect($value)};
+      }
+    }
+  }
+}
+
+/* If the two class selectors define the transition property
+   and these two classes are added to the one HTML element
+   the transition values from two clases are not concatenated into one value.
+   The transitions @mixin solves this problem:
+   Create the transition templates, where you define:
+     "before" property with [map] value that contains property:value pairs before the transition action
+     "after" property with [map] value that contains property:value pairs after the transition action
+     "transition" property with all transition parameters (comma separated, when there are more
+                  than one transitioned property in this transition template)
+*/
+
+$anim-border: (
+  before:(border:solid 1px #33aaff),
+  after:(border:solid 4px #ff55aa),
+  transition:border .1s .4s ease-in-out
+);
+
+$anim-colors: (
+  before:(background-color:white, color:#33aaff),
+  after:(background-color:yellow, color:#ff55aa),
+  transition:(background-color .2s ease-in-out, color .3s .2s ease-in-out)
+);
+
+/* The transitions @mixin takes the following arguments:
+     selector: eg. hover, focus
+     templates: the comma separated list of prepared transition templates. */
+
+.button{
+  @include transitions(hover,$anim-colors, $anim-border);
+}
+
+.text{
+  @include transitions(hover,$anim-colors);
+}
+
+.field{
+  @include transitions(focus,$anim-border);
+}
