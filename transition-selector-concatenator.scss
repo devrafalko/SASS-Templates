@@ -1,0 +1,72 @@
+@mixin transitions($compositions...){
+  $list:();
+  $selectorMap:();
+  
+  @each $getComposition in $compositions{
+    $list: append($list, map-get($getComposition, transition), comma);
+    @each $prop, $value in map-get($getComposition, before) {
+      #{inspect($prop)}: #{inspect($value)};
+    }
+  }
+  transition: $list;
+
+  @each $getComposition in $compositions{
+    $only-selectors: map-remove($getComposition, before, transition);
+    @each $selector,$val in $only-selectors {
+      @if map-has-key($selectorMap, $selector) == true {
+        $merged: map-merge(map-get($selectorMap,$selector),$val);
+        $selectorMap:map-merge($selectorMap, ($selector:$merged));
+      } @else {
+        $selectorMap:map-merge($selectorMap, ($selector:$val));
+      }
+    }
+  }
+  @each $selector,$property-set in $selectorMap{
+    &:#{$selector}{
+      @each $property, $value in $property-set{
+        #{inspect($property)}: #{inspect($value)};
+      }
+    }
+  }
+}
+
+/* If the two class selectors define the transition property
+   and these two classes are added to the one HTML element
+   the transition values from two clases are not concatenated into one value.
+   The transitions @mixin solves this problem:
+   Create the transition templates, where you define:
+     * "before" property with [map] value that contains property:value pairs before the transition action
+     * "transition" property with all transition parameters (comma separated, when there are more
+                    than one transitioned property in this transition template)
+     * selector parameter(s) with [map] value that contains property:value pairs after the transition action
+*/
+
+$colors:(
+  before:(color:blue,background-color:yellow),
+  transition:(color .1s ease-in-out,background-color .1s ease-in-out),
+  hover:(color:red, background-color:orange),
+  focus:(color:blue, background-color:white)
+);
+
+$borders:(
+  before:(border:solid 1px orange),
+  transition:(border .15s ease-in-out),
+  hover:(border:solid 3px red),
+  focus:(border: solid 5px blue)
+);
+
+/* The transitions @mixin takes the following arguments:
+     selector: eg. hover, focus
+     templates: the comma separated list of prepared transition templates. */
+
+.button{
+  @include transitions($colors,$borders);
+}
+
+.text{
+  @include transitions($colors);
+}
+
+.field{
+  @include transitions($borders);
+}
