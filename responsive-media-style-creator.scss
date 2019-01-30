@@ -47,7 +47,7 @@
 @include media(medium,andlarger){};   769px   <
 @include media(large){};              993px   - 1200px
 @include media(large,andsmaller){};           < 1200px
-@include media(large,andlarger){};    993px  <
+@include media(large,andlarger){};    993px   <
 @include media(xlarge){};             1201px  <
 */
 
@@ -67,7 +67,7 @@
 }
 
 .containerA {
-  background-color:green;             //769px - 992px;
+  background-color:green;           //769px - 992px;
 	
   @include media(small,andsmaller){	  //0px - 768px
     background-color:red
