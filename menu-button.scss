@@ -1,4 +1,5 @@
-@mixin menu-button($width: 16px, $height: 60px, $diameter: 16px, $color: white) {
+
+@mixin menu-button($dots: 3, $time: .15s, $delay: .15s, $width: 16px, $height: 60px, $diameter: 16px, $color: white, $hover-diameter: $diameter * 1.15, $hover-color: $color) {
   $bezier: cubic-bezier(0.240, 2, 0.440, 0.990);
   width:$width;
   height:$height;
@@ -7,6 +8,13 @@
     width:0px;
     height:0px;
   }
+
+  &:hover>*>*{
+    width:$hover-diameter;
+    height:$hover-diameter;
+    background-color:$hover-color;
+  }
+
   &>*{
     position:relative;
     width:100%;
@@ -24,32 +32,67 @@
       background-color:$color;
       border-radius:50%;
     }
-    &:nth-child(1)>*{
-      transition:width .15s $bezier, height .15s $bezier;
-    }
-    &:nth-child(2)>*{
-      transition:width .15s .15s $bezier, height .15s .15s $bezier;
-    }
-    &:nth-child(3)>*{
-      transition:width .15s .3s $bezier, height .15s .3s $bezier;
+    @for $dot from 1 through $dots {
+      $break: $dot - 1;
+      &:nth-child(#{$dot})>*{
+        transition:
+          width $time $delay * $break $bezier, 
+          height $time $delay * $break $bezier, 
+          background-color $time $delay * $break ease-in-out;
+      }
     }
   }
 }
 
 /*
-It creates a three-dots menu button that pupses when is hidden|shown.
+It creates a dots menu button that pulses when is hidden|shown.
 Toggle the .hidden class to show|hide the menu button.
 
+Arguments:
+  $dots  - how many dots are in the button
+  $time  - how long should transition last
+  $delay  - the delay between each dot transition
+  $width  - the width of the button (the dots are centered horizontally)
+  $height  - the height of the button (the dots are evenly distributed vertically)
+  $diameter - the diameter of each dot
+  $color - the dot color
+  $hover-diameter - the diameter of hovered dot
+  $hover-color - the color of hovered dot
+
+*/
+
+/* Sample
+
 HTML
-  <div class="menu-button hidden">
-    <div><i></i></div>
-    <div><i></i></div>
-    <div><i></i></div>
-  </div>
+
+	<div id="button" class="menu-button"> <!-- toggle 'hidden' class -->
+		<div><i></i></div>
+		<div><i></i></div>
+		<div><i></i></div>
+		<div><i></i></div>
+		<div><i></i></div>
+		<div><i></i></div>
+	</div>
 
 SCSS
-  .menu-button{
-    @include menu-button;
+
+  @import 'menu-button';
+
+  #button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    @include menu-button(
+      $dots: 6,
+      $time: .1s,
+      $delay: .03s,
+      $width: 18px,
+      $height: 60px,
+      $diameter: 8px,
+      $hover-diameter: 18px,
+      $color: #999999,
+      $hover-color: #33aaff
+    );
   }
 
 */
