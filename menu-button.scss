@@ -4,6 +4,11 @@
   width:$width;
   height:$height;
   cursor:pointer;
+  pointer-events: auto;
+  &.hidden{
+    pointer-events: none;
+  }
+  
   &.hidden>*>*{
     width:0px;
     height:0px;
